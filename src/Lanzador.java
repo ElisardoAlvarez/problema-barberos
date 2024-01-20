@@ -2,39 +2,36 @@ package src;
 
 public class Lanzador {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        int MAX_BARBEROS = 2;
+        int MAX_SILLAS   = 3;
+        int MAX_CLIENTES = 1000;
+        Barbero[] barberos;
+        Thread[]  hilos;
 
-        int MAX_BARBEROS        =2;
-        int MAX_SILLAS          =MAX_BARBEROS+1;
-        int MAX_CLIENTES        =MAX_BARBEROS*10;
-        int MAX_ESPERA_SEGS     = 3;
-        GestorConcurrencia gc;
-        gc=new GestorConcurrencia(MAX_SILLAS);
+        barberos=new Barbero[MAX_BARBEROS];
+        hilos   =new Thread [MAX_BARBEROS];
 
-        Thread[] vhBarberos     =new Thread[MAX_BARBEROS];
-        for (int i=0; i<MAX_BARBEROS;i++){
-            Barbero b=new Barbero(gc, "Barbero "+i);
-            Thread hilo=new Thread(b);
-            vhBarberos[i]=hilo;
-            hilo.start();
+        GestorSillas gestorSillas=new GestorSillas(MAX_SILLAS);
+
+        for (int i=0; i<MAX_BARBEROS; i++){
+            barberos[i]=new Barbero(gestorSillas);
+            hilos[i]   =new Thread(barberos[i]);
+
+            hilos[i].start();
+        } //Fin del for
+
+
+        for (int i=0; i< MAX_CLIENTES; i++){
+            Cliente c=new Cliente(gestorSillas);
+            c.entrarEnBarberia();
         }
-
-        /* Generamos unos cuantos clientes
-         * a intervalos aleatorios
-         */
-        Random generador=new Random();
-        for (int i=0; i<MAX_CLIENTES; i++){
-            Cliente c                       =new Cliente(gc);
-            Thread hiloCliente      =new Thread(c);
-            hiloCliente.start();
-
-            int msegs=generador.nextInt(3)*1000;
-            try {
-                Thread.sleep(msegs);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } /* Fin del for*/
-    }
-}
+        Barbero.esperarTiempoAzar(30);
+        /* La jornada ha terminado, "cerramos" los barberos*/
+        for (int i=0; i<MAX_BARBEROS; i++){
+            barberos[i].cerrarBarberia();
+            hilos[i].join();
+        }
+        System.out.println("Barberia cerrada.");
+    } //Fin del main
+} //Fin de la clase

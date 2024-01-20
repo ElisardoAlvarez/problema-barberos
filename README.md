@@ -11,4 +11,7 @@ Se recuerda que no debe haber inanición, es decir ningún cliente debería qued
 ## Solución 1 Barberos dormilones
 El problema está en que la forma que tiene el gestor de concurrencia de decirle a un barbero qué silla tiene un cliente sin afeitar es incorrecta: como siempre se empieza a buscar por el principio del vector, los clientes sentados al final nunca son atendidos. Hay que corregir esa asignación para evitar que los procesos sufran de inanición.
 
+## Solución 2 Barberos justicieros
+La solución anterior tiene el problema de que los barberos que están al final de la lista de barberos nunca son atendidos. Para solucionarlo, se puede hacer que el barbero que atiende al cliente sea el que menos clientes tenga en su silla. Para ello, se puede usar un semáforo que controle el acceso a la lista de barberos y que se modifique la asignación de barbero a cliente para que sea el barbero con menos clientes el que atienda al cliente.
+
 

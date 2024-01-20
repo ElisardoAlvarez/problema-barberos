@@ -1,15 +1,15 @@
 package src;
-
-public class Cliente implements Runnable{
-    GestorConcurrencia      gc;
-    public Cliente(GestorConcurrencia gc){
-        this.gc         =gc;
+public class Cliente  {
+    GestorSillas gestorSillas;
+    public Cliente(GestorSillas g){
+        this.gestorSillas = g;
     }
-    public void run(){
-        /* Los clientes no esperan que haya
-         * sillas libres, no hay bucle infinito.
-         * Si no hay sillas libres se van...
-         */
-        gc.getSillaLibre();
+    public void entrarEnBarberia(){
+        int posSillaLibre = this.gestorSillas.getPosSillaLibre();
+        if (posSillaLibre==-1){
+            System.out.println("No habia sillas libres, me marcho");
+            return ;
+        }
+        System.out.println("Me siento en la silla:"+posSillaLibre);
     }
 }

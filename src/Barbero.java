@@ -1,18 +1,34 @@
 package src;
-
-import java.util.Random;
-public class Barbero implements Runnable {
-    private String              nombre;
-    private GestorConcurrencia  gc;
-    private Random              generador;
-    private int                 MAX_ESPERA_SEGS=5;
-    public Barbero(GestorConcurrencia gc,String nombre){
-        this.nombre     =nombre;
-        this.gc         =gc;
-        this.generador  =new Random();
+public class Barbero implements Runnable{
+    GestorSillas gestorSillas;
+    boolean barberiaAbierta;
+    public Barbero (GestorSillas g){
+        gestorSillas=g;
+        barberiaAbierta=true;
     }
 
-    public void esperarTiempoAzar(int max){
+    public void cerrarBarberia(){
+        this.barberiaAbierta=false;
+    }
+    @Override
+    public void run() {
+        while(barberiaAbierta){
+            int posSillaClienteSinAtender;
+            posSillaClienteSinAtender=
+                    this.gestorSillas.getSiguienteCliente();
+            if (posSillaClienteSinAtender==-1){
+                esperarTiempoAzar(3);
+            } else {
+                System.out.println("Barbero atendiendo silla:" +
+                        posSillaClienteSinAtender);
+                esperarTiempoAzar(3);
+                this.gestorSillas.liberarSilla(posSillaClienteSinAtender);
+            }
+        }
+    }
+
+    public static void esperarTiempoAzar(int max){
+        Random generador=new Random();
         /* Se calculan unos milisegundos al azar*/
         int msgs=(1+generador.nextInt(max))*1000;
         try {
@@ -22,25 +38,5 @@ public class Barbero implements Runnable {
             e.printStackTrace();
         }
     }
-    public void run(){
-        while (true){
-            int num_silla=gc.atenderAlgunCliente();
-            while (num_silla==-1){
-                /* Mientras no haya nadie a quien
-                 * atender, dormimos
-                 */
-                esperarTiempoAzar(MAX_ESPERA_SEGS);
-                num_silla=gc.atenderAlgunCliente();
-            }
-            /* Si llegamos aqui es que había algún cliente
-             * Simulamos un tiempo de afeitado
-             */
-            esperarTiempoAzar(MAX_ESPERA_SEGS);
-            /* Tras ese tiempo de afeitado se
-             * libera la silla
-             */
-            gc.liberarSilla(num_silla);
-            /* Y vuelta a empezar*/
-        }
-    }
+
 }
